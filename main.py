@@ -11,10 +11,11 @@ def get_specific_time():
         ntp_client = ntplib.NTPClient()
         response = ntp_client.request(ip_address, port=123, version=3, timeout=10)
         
-        # Get the Unix timestamp and convert to datetime
+        # Get the Unix timestamp from the NTP server response.
         ntp_timestamp = int(response.tx_time)
-        ntp_datetime = datetime.datetime.fromtimestamp(ntp_timestamp)
-        return ntp_datetime, ntp_timestamp
+        # Use utcfromtimestamp to get the UTC datetime (as returned by the NTP server)
+        dt_utc = datetime.datetime.utcfromtimestamp(ntp_timestamp)
+        return dt_utc, ntp_timestamp
     except Exception as e:
         print("Error retrieving time:", e)
         return None, None
@@ -22,7 +23,7 @@ def get_specific_time():
 while True:
     dt, ts = get_specific_time()
     if dt:
-        print("Datetime from NTP server:", dt, "Timestamp:", ts)
+        print("UTC Datetime from NTP server:", dt, "Timestamp:", ts)
     else:
         print("Failed to retrieve time.")
     time.sleep(10)
